@@ -27,20 +27,23 @@ function init() {
   var ambientLight = new THREE.AmbientLight(0xbbbbbb);
   scene.add(ambientLight);
 
-  //texture - must not be in same folder or there is an error
-  var texture = THREE.ImageUtils.loadTexture('img/tex.jpg', {}, function() {
-    // throws an error if image doesn't load
-  },
-  function() {
-    alert('error');
-  });
-
   var geometry = new THREE.BoxGeometry(1, 1, 1);
-  material = new THREE.MeshBasicMaterial({ map: texture });
-  cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
+  var loader = new THREE.TextureLoader();
 
-
+  loader.load(
+    'img/tex.jpg',
+    function(texture) {
+      material = new THREE.MeshBasicMaterial({ map: texture });
+      cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+    },
+    function(xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    function(xhr) {
+      console.log('An error happened');
+    }
+  );
 }
 
 
