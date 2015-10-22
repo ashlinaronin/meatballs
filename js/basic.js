@@ -30,6 +30,7 @@ function init() {
   camera.position.z = 15;
   scene.add(camera);
 
+
   cubes = new THREE.Group();
   scene.add(cubes);
 
@@ -37,17 +38,46 @@ function init() {
   // controls.addEventListener('change', render);
   loader = new THREE.TextureLoader();
 
-  //directional lighting
-  var directionalLight = new THREE.DirectionalLight(0xffffff, .5);
-  directionalLight.position.set(1, 1, 1);
-  directionalLight.castShadow = true;
-  directionalLight.shadowDarkness = 0.5;
-  scene.add(directionalLight);
+  // Directional light
+  var dirLight = new THREE.DirectionalLight(0xffffff, 1);
+  dirLight.position.set(-1, 1.75, 1);
+  scene.add(dirLight);
+  dirLight.castShadow = true;
+  dirLight.shadowMapWidth = 2048;
+  dirLight.shadowMapHeight = 2048;
 
-  var spotLigh = new THREE.SpotLight(0xffffff, 1, 200, 20, 10);
-  spotLigh.position.set(0,100,0);
-  scene.add(spotLigh);
-  scene.add(new THREE.PointLightHelper(spotLigh, 1));
+  var d = 50;
+  dirLight.shadowCameraLeft = -d;
+  dirLight.shadowCameraRight = d;
+  dirLight.shadowCameraTop = d;
+  dirLight.shadowCameraBottom = -d;
+
+  dirLight.shadowCameraFar = 3500;
+  dirLight.shadowBias = -0.0001;
+
+  // Ground
+  var groundGeo = new THREE.PlaneBufferGeometry(10000,10000);
+  var groundMat = new THREE.MeshPhongMaterial({color: 0x111111, specular: 0x050505});
+
+  var ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI/2;
+  ground.position.y = -33;
+  scene.add(ground);
+  ground.receiveShadow = true;
+
+
+  // Spotlight
+  var spotLight = new THREE.SpotLight(0xffffff, 1, 200, 20, 10);
+  spotLight.position.set(0,100,0);
+  spotLight.castShadow = true;
+  spotLight.shadowMapWidth = 1024;
+  spotLight.shadowMapHeight = 1024;
+
+  spotLight.shadowCameraNear = 500;
+  spotLight.shadowCameraFar = 4000;
+  spotLight.shadowCameraFov = 30;
+  scene.add(spotLight);
+  scene.add(new THREE.PointLightHelper(spotLight, 1));
 
 
   // Set background to have transparency- alpha: true
@@ -67,12 +97,25 @@ function init() {
   window.addEventListener('resize', onWindowResize, false);
 
   // Create 13 texture cubes from jpgs in textures folder and put them in a row
-  var numTextures = 13;
+  var numTextures = 1;
+  var min = 0;
+  var max = 27;
   for (var i = 0; i < numTextures; i++) {
-    createTextureCube('textures/' + i + '.jpg', 3, i*6, 0, 0);
+    var xval = getRandomInt(min, max);
+    var yval = getRandomInt(min, max);
+    var zval = getRandomInt(min, max);
+    // createTextureCube('textures/' + i + '.jpg', 9, xval, yval, zval);
+    createTextureCube('textures/' + i + '.jpg', 9, 0, 0, 0);
   }
 }
 
+/*
+** Returns a random integer between min (inclusive) and max (inclusive).
+** Thanks to MDN.
+*/
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 
 // Create a cube with the given size, texture url and position.
@@ -107,22 +150,46 @@ function onWindowResize() {
   render();
 }
 
-function animate() {
-  requestAnimationFrame(animate);
+// Can do something with keydown here
+function onKeyDown (event) {
+	switch ( event.keyCode ) {
+		case 72: // h
+		  // hemiLight.visible = !hemiLight.visible;
+      console.log("h pressed");
+  		break;
 
-  render();
-  stats.update();
-
+		case 68: // d
+		  // dirLight.visible = !dirLight.visible;
+      console.log("d pressed");
+  		break;
+	}
 }
 
 
 
+
+function animate() {
+  requestAnimationFrame(animate);
+  render();
+  stats.update();
+}
+
+
 function render() {
-  cubes.rotation.y += 0.01;
+  // cubes.rotation.y += 0.01;
 
+  // Don't run it the first time to avoid an error
+  if (cubes.children[0]) {
+    cubes.children[0].rotation.y += 0.01;
+  }
 
-  // cube.rotation.y += 0.05;
-  // cube.rotation.x += 0.01;
+  if (cubes.children[1]) {
+    cubes.children[1].rotation.y += 0.02;
+  }
+
+  if (cubes.children[2]) {
+    cubes.children[2].rotation.y += 0.05;
+  }
+
   renderer.render(scene, camera);
-  // stats.update();
 }
