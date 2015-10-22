@@ -21,6 +21,7 @@ function init() {
   // controls.addEventListener('change', render);
 
   scene = new THREE.Scene();
+  scene.fog = new THREE.Fog( 0xcce0ff, 500, 10000 );
 
   //directional lighting
   var directionalLight = new THREE.DirectionalLight(0xffffff, .5);
@@ -52,26 +53,34 @@ function init() {
   window.addEventListener('resize', onWindowResize, false);
 
 
-  var geometry = new THREE.BoxGeometry(3, 3, 3);
-  var loader = new THREE.TextureLoader();
 
+
+var geometry = new THREE.BoxGeometry(1,1,1);
 
   // Beware -- MeshBasicMaterial is not affected by lighting
-  loader.load(
-    'img/tex.jpg',
-    function(texture) {
-      material = new THREE.MeshPhongMaterial({ map: texture });
-      cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
-    },
-    function(xhr) {
-      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-    },
-    function(xhr) {
-      console.log('An error happened');
-    }
-  );
+  var numTextures = 13;
+  // for (var i = 0; i < numTextures; i++) {
+  var i = 3;
+    var loader = new THREE.TextureLoader();
+    loader.load(
+      'textures/' + 3 + '.jpg',
+      function(texture) {
+
+        var newMaterial = new THREE.MeshPhongMaterial({ map: texture });
+        var newCube = new THREE.Mesh(geometry, material);
+        console.dir(newCube);
+        scene.add(newCube);
+      },
+      function(xhr) {
+        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+      },
+      function(xhr) {
+        console.log('An error happened while loading texture images.');
+      }
+    );
+  // }
 }
+
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
