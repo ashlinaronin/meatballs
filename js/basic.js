@@ -28,13 +28,16 @@ animate();
 
 function init() {
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog( 0xcce0ff, 500, 10000 );
+  // scene.fog = new THREE.Fog( 0xcce0ff, 500, 10000 );
+  scene.fog = new THREE.FogExp2( 0x111111, 0.0025 );
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-  // camera.aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = window.innerWidth / window.innerHeight;
 
   // Move back a little bit so the cube isn't in our face!!
-  camera.position.z = 15;
+  camera.position.z = 10;
+  camera.position.y = 16;
+  camera.position.x = 16;
   scene.add(camera);
 
   // Not using a Group anymore
@@ -58,19 +61,21 @@ function init() {
   dirLight.shadowCameraRight = d;
   dirLight.shadowCameraTop = d;
   dirLight.shadowCameraBottom = -d;
-
   dirLight.shadowCameraFar = 3500;
   dirLight.shadowBias = -0.0001;
+
+
 
   // Ground
   var groundGeo = new THREE.PlaneBufferGeometry(10000,10000);
   var groundMat = new THREE.MeshPhongMaterial({color: 0x111111, specular: 0x050505});
-
   var ground = new THREE.Mesh(groundGeo, groundMat);
   ground.rotation.x = -Math.PI/2;
   ground.position.y = -33;
   scene.add(ground);
   ground.receiveShadow = true;
+
+
 
 
   // Spotlight
@@ -79,7 +84,6 @@ function init() {
   spotLight.castShadow = true;
   spotLight.shadowMapWidth = 1024;
   spotLight.shadowMapHeight = 1024;
-
   spotLight.shadowCameraNear = 500;
   spotLight.shadowCameraFar = 4000;
   spotLight.shadowCameraFov = 30;
