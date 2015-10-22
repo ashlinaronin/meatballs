@@ -4,24 +4,38 @@ var viewport, stats;
 
 var scene, camera, renderer, loader, mesh, material, cube;
 var group;
+var cubes;
+var loader;
 
 init();
-render();
+animate();
 
+scene.traverse (function (object)
+{
+    if (object instanceof THREE.Mesh)
+    {
+        console.log(object.name);
+
+    }
+});
 
 function init() {
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog( 0xcce0ff, 500, 10000 );
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
   // camera.aspect = window.innerWidth / window.innerHeight;
 
   // Move back a little bit so the cube isn't in our face!!
-  camera.position.z = 25;
+  camera.position.z = 15;
+  scene.add(camera);
+
+  cubes = new THREE.Group();
+  scene.add(cubes);
 
   controls = new THREE.OrbitControls(camera);
   // controls.addEventListener('change', render);
-
-  scene = new THREE.Scene();
-  scene.fog = new THREE.Fog( 0xcce0ff, 500, 10000 );
+  loader = new THREE.TextureLoader();
 
   //directional lighting
   var directionalLight = new THREE.DirectionalLight(0xffffff, .5);
@@ -52,33 +66,36 @@ function init() {
 
   window.addEventListener('resize', onWindowResize, false);
 
-
-
-
-var geometry = new THREE.BoxGeometry(1,1,1);
-
-  // Beware -- MeshBasicMaterial is not affected by lighting
+  // Create 13 texture cubes from jpgs in textures folder and put them in a row
   var numTextures = 13;
-  // for (var i = 0; i < numTextures; i++) {
-  var i = 3;
-    var loader = new THREE.TextureLoader();
-    loader.load(
-      'textures/' + 3 + '.jpg',
-      function(texture) {
+  for (var i = 0; i < numTextures; i++) {
+    createTextureCube('textures/' + i + '.jpg', 3, i*6, 0, 0);
+  }
+}
 
-        var newMaterial = new THREE.MeshPhongMaterial({ map: texture });
-        var newCube = new THREE.Mesh(geometry, material);
-        console.dir(newCube);
-        scene.add(newCube);
-      },
-      function(xhr) {
-        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-      },
-      function(xhr) {
-        console.log('An error happened while loading texture images.');
-      }
-    );
-  // }
+
+
+// Create a cube with the given size, texture url and position.
+// Add it to the cubes group.
+function createTextureCube(textureUrl, size, xpos, ypos, zpos) {
+  loader.load(
+    textureUrl,
+    function(texture) {
+      var newGeometry = new THREE.BoxGeometry(size, size, size);
+      var newMaterial = new THREE.MeshPhongMaterial({ map: texture });
+      var newCube = new THREE.Mesh(newGeometry, newMaterial);
+      cubes.add(newCube);
+      newCube.position.x = xpos;
+      newCube.position.y = ypos;
+      newCube.position.z = zpos;
+    },
+    function(xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    function(xhr) {
+      console.log('An error happened while loading texture images.');
+    }
+  );
 }
 
 
@@ -90,10 +107,22 @@ function onWindowResize() {
   render();
 }
 
+function animate() {
+  requestAnimationFrame(animate);
+
+  render();
+  stats.update();
+
+}
+
+
+
 function render() {
-  requestAnimationFrame(render);
+  cubes.rotation.y += 0.01;
+
+
   // cube.rotation.y += 0.05;
   // cube.rotation.x += 0.01;
   renderer.render(scene, camera);
-  stats.update();
+  // stats.update();
 }
