@@ -3,8 +3,9 @@
 var viewport, stats;
 
 var scene, camera, renderer, loader, mesh, material, cube;
-var group;
-var cubes;
+// var group;
+// change cubes to be array of objects, not a group
+var cubes = [];
 var loader;
 
 init();
@@ -31,8 +32,8 @@ function init() {
   scene.add(camera);
 
 
-  cubes = new THREE.Group();
-  scene.add(cubes);
+  // cubes = new THREE.Group();
+  // scene.add(cubes);
 
   controls = new THREE.OrbitControls(camera);
   // controls.addEventListener('change', render);
@@ -127,7 +128,8 @@ function createTextureCube(textureUrl, size, xpos, ypos, zpos) {
       var newGeometry = new THREE.BoxGeometry(size, size, size);
       var newMaterial = new THREE.MeshPhongMaterial({ map: texture });
       var newCube = new THREE.Mesh(newGeometry, newMaterial);
-      cubes.add(newCube);
+      scene.add(newCube);
+      cubes.push(newCube);
       newCube.position.x = xpos;
       newCube.position.y = ypos;
       newCube.position.z = zpos;
@@ -176,19 +178,16 @@ function animate() {
 
 
 function render() {
-  // cubes.rotation.y += 0.01;
+  // for (var i = 0; i < cubes.length; i++) {
+  //   console.log('cubes');
+    // cubes[0].rotation.y += 0.01;
+    // cubes[i].rotation.y += (i * 0.01);
+  // }
 
-  // Don't run it the first time to avoid an error
-  if (cubes.children[0]) {
-    cubes.children[0].rotation.y += 0.01;
-  }
 
-  if (cubes.children[1]) {
-    cubes.children[1].rotation.y += 0.02;
-  }
-
-  if (cubes.children[2]) {
-    cubes.children[2].rotation.y += 0.05;
+  // Don't try to rotate it first time before cube is created
+  if (cubes[0]) {
+    cubes[0].rotation.y += 0.01;
   }
 
   renderer.render(scene, camera);
