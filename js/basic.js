@@ -13,6 +13,7 @@ document.addEventListener('keydown', onKeyDown, false);
 // var group;
 // change cubes to be array of objects, not a group
 var cubes = [];
+var spheres = [];
 var loader;
 
 init();
@@ -106,13 +107,17 @@ function init() {
   var numTextures = 1;
   var min = 0;
   var max = 27;
-  for (var i = 0; i < numTextures; i++) {
-    var xval = getRandomInt(min, max);
-    var yval = getRandomInt(min, max);
-    var zval = getRandomInt(min, max);
-    // createTextureCube('textures/' + i + '.jpg', 9, xval, yval, zval);
-    createTextureCube('textures/' + i + '.jpg', 9, 0, 0, 0);
-  }
+
+  // Temporarily disable texture cubes
+  // for (var i = 0; i < numTextures; i++) {
+  //   var xval = getRandomInt(min, max);
+  //   var yval = getRandomInt(min, max);
+  //   var zval = getRandomInt(min, max);
+  //   // createTextureCube('textures/' + i + '.jpg', 9, xval, yval, zval);
+  //   createTextureCube('textures/' + i + '.jpg', 9, 0, 0, 0);
+  // }
+
+  createTextureSphere('textures/7.jpg', 0, 0, 0);
 }
 
 /*
@@ -138,6 +143,30 @@ function createTextureCube(textureUrl, size, xpos, ypos, zpos) {
       newCube.position.x = xpos;
       newCube.position.y = ypos;
       newCube.position.z = zpos;
+    },
+    function(xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    function(xhr) {
+      console.log('An error happened while loading texture images.');
+    }
+  );
+}
+
+// Create a sphere with the given texture url and position.
+// Add it to the spheres group.
+function createTextureSphere(textureUrl, xpos, ypos, zpos) {
+  loader.load(
+    textureUrl,
+    function(texture) {
+      var newGeometry = new THREE.SphereGeometry(5,32,32);
+      var newMaterial = new THREE.MeshPhongMaterial({ map: texture });
+      var newSphere = new THREE.Mesh(newGeometry, newMaterial);
+      scene.add(newSphere);
+      spheres.push(newSphere);
+      newSphere.position.x = xpos;
+      newSphere.position.y = ypos;
+      newSphere.position.z = zpos;
     },
     function(xhr) {
       console.log((xhr.loaded / xhr.total * 100) + '% loaded');
@@ -189,7 +218,11 @@ function render() {
 
   // Don't try to rotate it first time before cube is created
   if (cubes[0]) {
-    cubes[0].rotation.y += 0.01;
+    cubes[0].rotation.y += 0.008;
+  }
+
+  if (spheres[0]) {
+    spheres[0].rotation.y += 0.01;
   }
 
   renderer.render(scene, camera);
