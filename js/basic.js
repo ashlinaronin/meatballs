@@ -3,6 +3,11 @@
 var viewport, stats;
 
 var scene, camera, renderer, loader, mesh, material, cube;
+
+// Need to add event listener here
+document.addEventListener('keydown', onKeyDown, false);
+
+
 // var group;
 // change cubes to be array of objects, not a group
 var cubes = [];
@@ -11,14 +16,12 @@ var loader;
 init();
 animate();
 
-scene.traverse (function (object)
-{
-    if (object instanceof THREE.Mesh)
-    {
-        console.log(object.name);
-
-    }
-});
+// Print out all objects
+// scene.traverse (function (object) {
+//   if (object instanceof THREE.Mesh) {
+//     console.log(object.name);
+//   }
+// });
 
 function init() {
   scene = new THREE.Scene();
@@ -31,7 +34,7 @@ function init() {
   camera.position.z = 15;
   scene.add(camera);
 
-
+  // Not using a Group anymore
   // cubes = new THREE.Group();
   // scene.add(cubes);
 
@@ -183,7 +186,6 @@ function render() {
     // cubes[0].rotation.y += 0.01;
     // cubes[i].rotation.y += (i * 0.01);
   // }
-
 
   // Don't try to rotate it first time before cube is created
   if (cubes[0]) {
