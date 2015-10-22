@@ -4,6 +4,8 @@ var viewport, stats;
 
 var scene, camera, renderer, loader, mesh, material, cube;
 
+var dirLight, spotLight;
+
 // Need to add event listener here
 document.addEventListener('keydown', onKeyDown, false);
 
@@ -43,7 +45,7 @@ function init() {
   loader = new THREE.TextureLoader();
 
   // Directional light
-  var dirLight = new THREE.DirectionalLight(0xffffff, 1);
+  dirLight = new THREE.DirectionalLight(0xffffff, 1);
   dirLight.position.set(-1, 1.75, 1);
   scene.add(dirLight);
   dirLight.castShadow = true;
@@ -71,7 +73,7 @@ function init() {
 
 
   // Spotlight
-  var spotLight = new THREE.SpotLight(0xffffff, 1, 200, 20, 10);
+  spotLight = new THREE.SpotLight(0xffffff, 1, 200, 20, 10);
   spotLight.position.set(0,100,0);
   spotLight.castShadow = true;
   spotLight.shadowMapWidth = 1024;
@@ -158,14 +160,12 @@ function onWindowResize() {
 // Can do something with keydown here
 function onKeyDown (event) {
 	switch ( event.keyCode ) {
-		case 72: // h
-		  // hemiLight.visible = !hemiLight.visible;
-      console.log("h pressed");
+		case 83: // s
+		  spotLight.visible = !spotLight.visible;
   		break;
 
 		case 68: // d
-		  // dirLight.visible = !dirLight.visible;
-      console.log("d pressed");
+		  dirLight.visible = !dirLight.visible;
   		break;
 	}
 }
