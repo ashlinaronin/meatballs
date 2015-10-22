@@ -18,7 +18,7 @@ function init() {
   camera.position.z = 25;
 
   controls = new THREE.OrbitControls(camera);
-  controls.addEventListener('change', render);
+  // controls.addEventListener('change', render);
 
   scene = new THREE.Scene();
 
@@ -55,6 +55,8 @@ function init() {
   var geometry = new THREE.BoxGeometry(3, 3, 3);
   var loader = new THREE.TextureLoader();
 
+
+  // Beware -- MeshBasicMaterial is not affected by lighting
   loader.load(
     'img/tex.jpg',
     function(texture) {
