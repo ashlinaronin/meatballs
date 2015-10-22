@@ -117,7 +117,15 @@ function init() {
   //   createTextureCube('textures/' + i + '.jpg', 9, 0, 0, 0);
   // }
 
-  createTextureSphere('textures/7.jpg', 0, 0, 0);
+  // createTextureSphere('textures/7.jpg', 0, 0, 0);
+  // Make five random face spheres
+  for (var i = 0; i < 5; i++) {
+    var xval = getRandomInt(min, max);
+    var yval = getRandomInt(min, max);
+    var zval = getRandomInt(min, max);
+    createTextureSphere('faces/' + i + '.jpg', xval, yval, zval);
+    // createTextureCube('faces/' + i + '.jpg', 9, 0, 0, 0);
+  }
 }
 
 /*
@@ -215,6 +223,12 @@ function render() {
     // cubes[0].rotation.y += 0.01;
     // cubes[i].rotation.y += (i * 0.01);
   // }
+
+  for (var i = 0; i < spheres.length; i++) {
+    // console.log('cubes');
+    // cubes[0].rotation.y += 0.01;
+    spheres[i].rotation.y += (i * 0.01);
+  }
 
   // Don't try to rotate it first time before cube is created
   if (cubes[0]) {
