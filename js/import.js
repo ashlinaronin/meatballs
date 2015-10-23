@@ -6,6 +6,8 @@ var scene, camera, renderer, loader, mesh, material, cube, controls;
 
 var dirLight, spotLight, ambientLight;
 
+var manager;
+
 // Need to add event listener here
 document.addEventListener('keydown', onKeyDown, false);
 
@@ -38,11 +40,9 @@ function init() {
   // now trying to add camera as child of object so it tracks it
   scene.add(camera);
 
-  // Not using a Group anymore
-  // cubes = new THREE.Group();
-  // scene.add(cubes);
 
-  // controls = new THREE.TrackballControls(camera);
+
+
   // controls = new THREE.OrbitControls(camera);
   // controls.addEventListener('change', render);
   controls = new THREE.TrackballControls( camera );
@@ -136,25 +136,14 @@ function init() {
 
 
   // Texture
-  var manager = new THREE.LoadingManager();
+  manager = new THREE.LoadingManager();
   manager.onProgress = function(item, loaded, total) {
     console.log(item, loaded, total);
   }
 
   var texture = new THREE.Texture();
 
-  // Define onProgress and onError callbacks to use in loaders later
-  // xhr = XML HTTP Request
-  var onProgress = function(xhr) {
-    if (xhr.lengthComputable) {
-      var percentComplete = xhr.loaded / xhr.total * 100;
-      console.log(Math.round(percentComplete, 2) + '% downloaded');
-    }
-  }
 
-  // Do nothing on error?
-  var onError = function(xhr) {
-  };
 
   // Create a new loader using the LoadingManager we created above
   // Then load the texture
@@ -164,47 +153,21 @@ function init() {
     texture.needsUpdate = true;
   });
 
-  // Create a new loader using the LoadingManager
-  // Overwrite the previous loader because we don't need it anymore
-  var loader = new THREE.OBJLoader(manager);
-  loader.load('new_meatballs/0.obj', function(object) {
-    object.traverse(function(child) {
-      if (child instanceof THREE.Mesh) {
-        child.material = new THREE.MeshPhongMaterial();
-        // child.material.map = texture;
-      }
-    });
-    // object.scale.set(9,9,9);
-    // object.scale.x = 30;
-    // object.scale.y = 30;
-    // object.scale.z = 30;
 
-    object.position.x = 0;
-    object.position.y = 0;
-    object.position.z = 0;
-    scene.add(object);
-    blobs.push(object);
-    // object.add(camera);
-  }, onProgress, onError); // Attach error, progress callbacks we defined above
+  // Make one meatball, works
+  createMeatball('new_meatballs/0.obj', 1, 0, 0, 0);
 
-  // var meatballCallback = function(geo) {
-  //   // using texture global here
-  //   console.log(texture);
-  //   var meatball = new THREE.Mesh(geo, texture);
-  //   meatball.position.set(0,0,0);
-  //   meatball.scale.set(3,3,3);
-  //   scene.add(meatball);
-  //   debugger;
-  // }
-  //
-  //
-  // var loader = new THREE.JSONLoader();
-  // loader.load('meatballs-js/meatball1.js', meatballCallback);
+  var numMeatballs = 10;
+
+  // Create numMeatballs meatballs at random locations
+  for (var i = 0; i < numMeatballs; i++) {
+    var xpos = getRandomInt(0, 50);
+    var ypos = getRandomInt(0, 50);
+    var zpos = getRandomInt(0, 50);
+    createMeatball('new_meatballs/' + i + '.obj', 1, xpos, ypos, zpos);
+  }
 
 
-
-  // axes = buildAxes(1000);
-  // scene.add(axes);
 
 
 
@@ -244,39 +207,48 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// From soledadpenades.com
-// function buildAxes( length ) {
-//   var axes = new THREE.Object3D();
-//
-//   axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( length, 0, 0 ), 0xFF0000, false ) ); // +X
-//   axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( -length, 0, 0 ), 0xFF0000, true) ); // -X
-//   axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, length, 0 ), 0x00FF00, false ) ); // +Y
-//   axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, -length, 0 ), 0x00FF00, true ) ); // -Y
-//   axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, length ), 0x0000FF, false ) ); // +Z
-//   axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, -length ), 0x0000FF, true ) ); // -Z
-//
-//   return axes;
-// }
-//
-// // from soledadpenades.com
-// function buildAxis( src, dst, colorHex, dashed ) {
-//   var geom = new THREE.Geometry(),
-//       mat;
-//
-//   if(dashed) {
-//           mat = new THREE.LineDashedMaterial({ linewidth: 3, color: colorHex, dashSize: 3, gapSize: 3 });
-//   } else {
-//           mat = new THREE.LineBasicMaterial({ linewidth: 3, color: colorHex });
-//   }
-//
-//   geom.vertices.push( src.clone() );
-//   geom.vertices.push( dst.clone() );
-//   geom.computeLineDistances(); // This one is SUPER important, otherwise dashed lines will appear as simple plain lines
-//
-//   var axis = new THREE.Line( geom, mat, THREE.LineSegments );
-//
-//   return axis;
-// }
+// Define onProgress and onError callbacks to use in loaders later
+// xhr = XML HTTP Request
+var onProgress = function(xhr) {
+  if (xhr.lengthComputable) {
+    var percentComplete = xhr.loaded / xhr.total * 100;
+    console.log(Math.round(percentComplete, 2) + '% downloaded');
+  }
+}
+
+// Do nothing on error?
+var onError = function(xhr) {
+};
+
+
+// DOESNT WORK YET
+function createMeatball(geometryUrl, size, xpos, ypos, zpos) {
+  var loader = new THREE.OBJLoader(manager);
+  loader.load(geometryUrl, function(object) {
+    object.traverse(function(child) {
+      if (child instanceof THREE.Mesh) {
+        child.material = new THREE.MeshPhongMaterial(
+          {
+            color: 0x00ff00,
+            specular: 0x009900,
+            shininess: 30,
+            shading: THREE.FlatShading
+          }
+        );
+        // add a texture here
+        // child.material.map = texture;
+      }
+    });
+    object.scale.set(size, size, size);
+
+    object.position.x = xpos;
+    object.position.y = ypos;
+    object.position.z = zpos;
+    scene.add(object);
+    blobs.push(object);
+    // object.add(camera);
+  }, onProgress, onError); // Attach error, progress callbacks we defined above
+}
 
 
 // Create a cube with the given size, texture url and position.
@@ -388,6 +360,13 @@ function render() {
     spheres[i].rotation.y += (i * 0.01);
   }
 
+  // Rotate blobs at different rates
+  for (var i = 0; i < blobs.length; i++) {
+    // console.log('cubes');
+    // cubes[0].rotation.y += 0.01;
+    blobs[i].rotation.y += (i * 0.01);
+  }
+
   // Don't try to rotate it first time before cube is created
   if (cubes[0]) {
     cubes[0].rotation.y += 0.008;
@@ -397,13 +376,13 @@ function render() {
     spheres[0].rotation.y += 0.01;
   }
 
-  if (blobs[0]) {
-    // blobs[0].rotation.y += 0.01;
-    // blobs[0].rotation.x += 0.002;
-    // var rotation_matrix = new THREE.Matrix4().makeRotationZ(rotateAngle);
-    // blobs[0].matrix.multiplySelf(rotation_matrix);
-    // blobs[0].setEulerFromRotationMatrix(blobs[0].matrix);
-  }
+  // if (blobs[0]) {
+  //   // blobs[0].rotation.y += 0.01;
+  //   // blobs[0].rotation.x += 0.002;
+  //   // var rotation_matrix = new THREE.Matrix4().makeRotationZ(rotateAngle);
+  //   // blobs[0].matrix.multiplySelf(rotation_matrix);
+  //   // blobs[0].setEulerFromRotationMatrix(blobs[0].matrix);
+  // }
 
   renderer.render(scene, camera);
 }
