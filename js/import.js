@@ -16,7 +16,7 @@ document.addEventListener('keydown', onKeyDown, false);
 // change cubes to be array of objects, not a group
 var cubes = [];
 var spheres = [];
-var blobs = [];
+var meatballs = [];
 var loader;
 
 init();
@@ -117,7 +117,7 @@ function init() {
   // Set background to have transparency- alpha: true
   renderer = new THREE.WebGLRenderer({ antialias: true});
   renderer.setSize(window.innerWidth, window.innerHeight);
-  // renderer.shadowMapEnabled = true;
+  renderer.shadowMapEnabled = true;
   // renderer.shadowMapType = THREE.PCFSoftShadowMap;
 
   viewport = document.getElementById("viewport").appendChild(renderer.domElement);
@@ -155,17 +155,24 @@ function init() {
 
 
   // Make one meatball, works
-  createMeatball('new_meatballs/0.obj', 1, 0, 0, 0);
+  // createMeatball('new_meatballs/0.obj', 1, 0, 0, 0);
 
   var numMeatballs = 10;
+
+  // make punkin
+  var xpos = getRandomInt(0, 50);
+  var ypos = getRandomInt(0, 50);
+  var zpos = getRandomInt(0, 50);
+  createMeatball('new_meatballs/pumpkin.obj', 1, xpos, ypos, zpos);
 
   // Create numMeatballs meatballs at random locations
   for (var i = 0; i < numMeatballs; i++) {
     var xpos = getRandomInt(0, 50);
     var ypos = getRandomInt(0, 50);
     var zpos = getRandomInt(0, 50);
-    createMeatball('new_meatballs/' + i + '.obj', 1, xpos, ypos, zpos);
+    createMeatball('new_meatballs/' + i + '.obj', 2, xpos, ypos, zpos);
   }
+
 
 
 
@@ -221,7 +228,8 @@ var onError = function(xhr) {
 };
 
 
-// DOESNT WORK YET
+// Create a new meatball with the given size, geometry url, and position.
+// Add it to the meatballs array.
 function createMeatball(geometryUrl, size, xpos, ypos, zpos) {
   var loader = new THREE.OBJLoader(manager);
   loader.load(geometryUrl, function(object) {
@@ -229,13 +237,14 @@ function createMeatball(geometryUrl, size, xpos, ypos, zpos) {
       if (child instanceof THREE.Mesh) {
         child.material = new THREE.MeshPhongMaterial(
           {
-            color: 0x00ff00,
+            color: 0xff8000,
             specular: 0x009900,
             shininess: 30,
-            shading: THREE.FlatShading
+            shading: THREE.SmoothShading
           }
         );
-        // add a texture here
+
+        // One would add a texture here
         // child.material.map = texture;
       }
     });
@@ -245,8 +254,8 @@ function createMeatball(geometryUrl, size, xpos, ypos, zpos) {
     object.position.y = ypos;
     object.position.z = zpos;
     scene.add(object);
-    blobs.push(object);
-    // object.add(camera);
+    meatballs.push(object);
+    // console.dir(meatballs);
   }, onProgress, onError); // Attach error, progress callbacks we defined above
 }
 
@@ -327,9 +336,9 @@ function onKeyDown (event) {
       console.log('camZ: ' + camera.position.z);
       break;
     case 79: // o
-      console.log('meatX: ' + blobs[0].position.x);
-      console.log('meatY: ' + blobs[0].position.y);
-      console.log('meatZ: ' + blobs[0].position.z);
+      console.log('meatX: ' + meatballs[0].position.x);
+      console.log('meatY: ' + meatballs[0].position.y);
+      console.log('meatZ: ' + meatballs[0].position.z);
 
       break;
 	}
@@ -352,37 +361,18 @@ function render() {
     // cubes[0].rotation.y += 0.01;
     // cubes[i].rotation.y += (i * 0.01);
   // }
-  var rotateAngle = 0.05;
 
-  for (var i = 0; i < spheres.length; i++) {
-    // console.log('cubes');
-    // cubes[0].rotation.y += 0.01;
-    spheres[i].rotation.y += (i * 0.01);
-  }
-
-  // Rotate blobs at different rates
-  for (var i = 0; i < blobs.length; i++) {
-    // console.log('cubes');
-    // cubes[0].rotation.y += 0.01;
-    blobs[i].rotation.y += (i * 0.01);
-  }
-
-  // Don't try to rotate it first time before cube is created
-  if (cubes[0]) {
-    cubes[0].rotation.y += 0.008;
-  }
-
-  if (spheres[0]) {
-    spheres[0].rotation.y += 0.01;
-  }
-
-  // if (blobs[0]) {
-  //   // blobs[0].rotation.y += 0.01;
-  //   // blobs[0].rotation.x += 0.002;
-  //   // var rotation_matrix = new THREE.Matrix4().makeRotationZ(rotateAngle);
-  //   // blobs[0].matrix.multiplySelf(rotation_matrix);
-  //   // blobs[0].setEulerFromRotationMatrix(blobs[0].matrix);
+  // Rotate spheres at different rates
+  // for (var i = 0; i < spheres.length; i++) {
+  //   // console.log('cubes');
+  //   // cubes[0].rotation.y += 0.01;
+  //   spheres[i].rotation.y += (i * 0.01);
   // }
+
+  // Rotate meatballs at different rates
+  for (var i = 0; i < meatballs.length; i++) {
+    meatballs[i].rotation.y += (i * 0.005);
+  }
 
   renderer.render(scene, camera);
 }
