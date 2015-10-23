@@ -4,7 +4,10 @@ var viewport, stats;
 
 var scene, camera, renderer, loader, mesh, material, cube, controls;
 
-var dirLight, spotLight, ambientLight;
+var meatTexture, meatGroundTexture;
+
+var dirLight, spotLight, ambientLight, pointLight1, pointLight2, pointLight3;
+
 
 var manager;
 
@@ -17,6 +20,7 @@ document.addEventListener('keydown', onKeyDown, false);
 var cubes = [];
 var spheres = [];
 var meatballs = [];
+var pumpkin;
 var loader;
 
 init();
@@ -35,7 +39,7 @@ function init() {
   // Move back a little bit so the cube isn't in our face!!
   camera.position.x = 0;
   camera.position.y = 0;
-  camera.position.z = 100;
+  camera.position.z = 150;
 
   // now trying to add camera as child of object so it tracks it
   scene.add(camera);
@@ -69,29 +73,68 @@ function init() {
   ambientLight = new THREE.AmbientLight(0x404040);
   scene.add(ambientLight);
 
+  // Point lights
+  var intensity = 2.5;
+  var distance = 100;
+  var color1 = 0xffa500; // orange
+  var color2 = 0xff0000; // red
+  var color3 = 0x00ff00; // green
+  pointLight1 = new THREE.PointLight(color1, intensity, distance);
+  pointLight1.position.set(0,-25,0);
+  // pointLight1.target.position.set(0,0,0);
+  scene.add(pointLight1);
+
+  pointLight2 = new THREE.PointLight(color2, intensity, distance);
+  pointLight2.position.set(100,0,0);
+  scene.add(pointLight2);
+
+  pointLight3 = new THREE.PointLight(color3, intensity, distance);
+  pointLight3.position.set(-100,0,0);
+  scene.add(pointLight3);
+
 
 
   // Directional light
-  dirLight = new THREE.DirectionalLight(0xffffff, 1);
-  dirLight.position.set(-1, 1.75, 1);
-  scene.add(dirLight);
-  dirLight.castShadow = true;
-  dirLight.shadowMapWidth = 2048;
-  dirLight.shadowMapHeight = 2048;
-
-  var d = 50;
-  dirLight.shadowCameraLeft = -d;
-  dirLight.shadowCameraRight = d;
-  dirLight.shadowCameraTop = d;
-  dirLight.shadowCameraBottom = -d;
-  dirLight.shadowCameraFar = 3500;
-  dirLight.shadowBias = -0.0001;
+  // dirLight = new THREE.DirectionalLight(0xffffff, 1);
+  // dirLight.position.set(-1, 1.75, 1);
+  // scene.add(dirLight);
+  // dirLight.castShadow = true;
+  // dirLight.shadowMapWidth = 2048;
+  // dirLight.shadowMapHeight = 2048;
+  //
+  // var d = 50;
+  // dirLight.shadowCameraLeft = -d;
+  // dirLight.shadowCameraRight = d;
+  // dirLight.shadowCameraTop = d;
+  // dirLight.shadowCameraBottom = -d;
+  // dirLight.shadowCameraFar = 3500;
+  // dirLight.shadowBias = -0.0001;
 
 
 
   // Ground
+  // use meat texture -- disabled
+  // meatGroundTexture = new THREE.Texture();
+  // var imgLoader = new THREE.ImageLoader(manager);
+  // imgLoader.load('textures/meatball.jpg', function(image) {
+  //   meatGroundTexture.image = image;
+  //   meatGroundTexture.needsUpdate = true;
+  // });
+  // meatGroundTexture.wrapS = THREE.RepeatWrapping;
+  // meatGroundTexture.wrapT = THREE.RepeatWrapping;
+  // meatGroundTexture.repeat.set(256,256);
+
+
   var groundGeo = new THREE.PlaneBufferGeometry(10000,10000);
-  var groundMat = new THREE.MeshPhongMaterial({color: 0x111111, specular: 0x050505});
+  var groundMat = new THREE.MeshPhongMaterial(
+    {
+      color: 0x111111,
+      specular: 0x050505,
+      // metal: true,
+      shininess: 30
+      // map: meatGroundTexture
+    }
+  );
   var ground = new THREE.Mesh(groundGeo, groundMat);
   ground.rotation.x = -Math.PI/2;
   ground.position.y = -33;
@@ -148,7 +191,7 @@ function init() {
   // Create a new loader using the LoadingManager we created above
   // Then load the texture
   var loader = new THREE.ImageLoader(manager);
-  loader.load('faces/3.jpg', function(image) {
+  loader.load('textures/8.jpg', function(image) {
     texture.image = image;
     texture.needsUpdate = true;
   });
@@ -159,18 +202,21 @@ function init() {
 
   var numMeatballs = 10;
 
-  // make punkin
-  var xpos = getRandomInt(0, 50);
-  var ypos = getRandomInt(0, 50);
-  var zpos = getRandomInt(0, 50);
-  createMeatball('new_meatballs/pumpkin.obj', 1, xpos, ypos, zpos);
+  // make punkin-- now make it at origin to heighten effect of rotating around punkin
+  // var xpos = getRandomInt(0, 50);
+  // var ypos = getRandomInt(0, 50);
+  // var zpos = getRandomInt(0, 50);
+  createMeatball('new_meatballs/pumpkin.obj', 1, 0, 0, 0);
 
   // Create numMeatballs meatballs at random locations
   for (var i = 0; i < numMeatballs; i++) {
     var xpos = getRandomInt(0, 50);
     var ypos = getRandomInt(0, 50);
     var zpos = getRandomInt(0, 50);
-    createMeatball('new_meatballs/' + i + '.obj', 2, xpos, ypos, zpos);
+
+    var size = getRandomInt(1,5);
+
+    createMeatball('new_meatballs/' + i + '.obj', size, xpos, ypos, zpos);
   }
 
 
@@ -235,17 +281,32 @@ function createMeatball(geometryUrl, size, xpos, ypos, zpos) {
   loader.load(geometryUrl, function(object) {
     object.traverse(function(child) {
       if (child instanceof THREE.Mesh) {
+
+        // One would add a normal material here
+
+
+        // use meat texture
+        // shouldn't need here because we've loaded it at the beginning
+        // but if we want different repeats
+        var meatTexture = new THREE.Texture();
+        var imgLoader = new THREE.ImageLoader(manager);
+        imgLoader.load('textures/meatball.jpg', function(image) {
+          meatTexture.image = image;
+          meatTexture.needsUpdate = true;
+        });
+
+        // then add metal reflection to meat
         child.material = new THREE.MeshPhongMaterial(
           {
-            color: 0xff8000,
-            specular: 0x009900,
-            shininess: 30,
+            // color: 0x000000,
+            specular: 0xffffff,
+            metal: true,
+            map: meatTexture,
+            shininess: 1,
             shading: THREE.SmoothShading
           }
         );
-
-        // One would add a texture here
-        // child.material.map = texture;
+        // child.material.map = meatTexture;
       }
     });
     object.scale.set(size, size, size);
@@ -254,8 +315,15 @@ function createMeatball(geometryUrl, size, xpos, ypos, zpos) {
     object.position.y = ypos;
     object.position.z = zpos;
     scene.add(object);
-    meatballs.push(object);
-    // console.dir(meatballs);
+
+
+    // If it's a meatball, add to meatballs array, else add to global pump
+    if (geometryUrl !== 'new_meatballs/pumpkin.obj') {
+      meatballs.push(object);
+    } else {
+      pumpkin = object;
+    }
+    console.dir(meatballs);
   }, onProgress, onError); // Attach error, progress callbacks we defined above
 }
 
@@ -371,7 +439,17 @@ function render() {
 
   // Rotate meatballs at different rates
   for (var i = 0; i < meatballs.length; i++) {
+    if (i === 0) {
+
+    }
     meatballs[i].rotation.y += (i * 0.005);
+    if (i === 0) {
+      meatballs[i].rotation.y += 0.005;
+    }
+  }
+
+  if (pumpkin) {
+    pumpkin.rotation.y += 0.001;
   }
 
   renderer.render(scene, camera);
