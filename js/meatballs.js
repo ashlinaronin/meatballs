@@ -134,7 +134,7 @@ function init() {
 // Encapsulate initial object creation to make sure the texture loads first.
 function createInitialObjects() {
   // Make punkin sun before meatball planets
-  createMeatball('new_meatballs/pumpkin.obj', 1, 0, 0, 0);
+  createMeatball('meatballs-obj/pumpkin.obj', 1, 0, 0, 0);
 
   // Create numMeatballs meatballs with random coords and sizes
   var numMeatballs = 10;
@@ -144,7 +144,7 @@ function createInitialObjects() {
     var ypos = getRandomInt(0, meatballMaxSize);
     var zpos = getRandomInt(0, meatballMaxSize);
     var size = getRandomInt(1,5);
-    createMeatball('new_meatballs/' + i + '.obj', size, xpos, ypos, zpos);
+    createMeatball('meatballs-obj/' + i + '.obj', size, xpos, ypos, zpos);
   }
 }
 
@@ -202,7 +202,7 @@ function createMeatball(geometryUrl, size, xpos, ypos, zpos) {
     scene.add(object);
 
     // If it's the pumpkin, add it to global pumpkin, else add to meatballs array
-    if (geometryUrl == 'new_meatballs/pumpkin.obj') {
+    if (geometryUrl == 'meatballs-obj/pumpkin.obj') {
       pumpkin = object;
     } else {
       meatballs.push(object);
