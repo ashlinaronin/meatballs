@@ -2,8 +2,7 @@ if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 // Declare all the variables we'll be using so they can be accessed
 // from many functions
-var viewport, stats;
-var scene, camera, renderer, loader, mesh, material, controls, manager;
+var viewport, stats, scene, camera, renderer, loader, controls, manager;
 var meatTexture, ground;
 var ambientLight, orangeLight, redLight, greenLight;
 
