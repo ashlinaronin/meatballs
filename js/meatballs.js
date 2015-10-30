@@ -203,10 +203,6 @@ function createMeatball(geometryUrl, size, xpos, ypos, zpos) {
     // If it's the pumpkin, add it to global pumpkin, else add to meatballs array
     if (geometryUrl == 'meatballs-obj/pumpkin.obj') {
       pumpkin = object;
-    } else {
-      meatballs.push(object);
-
-      // Try changing center of gravity
       pumpkin.translateX(-11);
       scene.add(pumpkin);
 
