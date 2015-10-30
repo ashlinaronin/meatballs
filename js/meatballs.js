@@ -198,13 +198,21 @@ function createMeatball(geometryUrl, size, xpos, ypos, zpos) {
     object.position.x = xpos;
     object.position.y = ypos;
     object.position.z = zpos;
-    scene.add(object);
+
 
     // If it's the pumpkin, add it to global pumpkin, else add to meatballs array
     if (geometryUrl == 'meatballs-obj/pumpkin.obj') {
       pumpkin = object;
     } else {
       meatballs.push(object);
+
+      // Try changing center of gravity
+      pumpkin.translateX(-11);
+      scene.add(pumpkin);
+
+    } else {
+      meatballs.push(object);
+      scene.add(object);
     }
   }, onProgress, onError); // Attach error, progress callbacks we defined above
 }
