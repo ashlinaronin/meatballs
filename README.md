@@ -7,7 +7,7 @@ According to the Fermi paradox, we can reasonably conclude that somewhere in the
 galaxy there exists a solar system in which lumpy meatlike planets orbit a
 meat-pumpkin. Scientists using the WebGL-based JavaScript library Three.js have
 recently produced a fairly accurate rendition of this solar system
-for your viewing pleasure.
+for your viewing pleasure. Thanks to Andre Brown for the 3d models.
 
 Setup
 ----------
@@ -22,7 +22,7 @@ $ python -m SimpleHTTPServer
 
 Technologies Used
 -----------------
-3DS Max, WebGL, Three.js, Stats.js
+3ds Max, WebGL, Three.js, Stats.js
 
 License
 ----------
