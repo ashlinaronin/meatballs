@@ -3,7 +3,7 @@ if (!Detector.webgl) Detector.addGetWebGLMessage();
 // Declare all the variables we'll be using so they can be accessed
 // from many functions
 var viewport, stats, scene, camera, renderer, loader, controls, manager;
-var meatTexture, ground;
+var meatTexture, ground, dummy;
 var ambientLight, orangeLight, redLight, greenLight;
 
 // Bind keydown event listener for lighting controls
@@ -198,13 +198,19 @@ function createMeatball(geometryUrl, size, xpos, ypos, zpos) {
     object.position.x = xpos;
     object.position.y = ypos;
     object.position.z = zpos;
-    scene.add(object);
 
     // If it's the pumpkin, add it to global pumpkin, else add to meatballs array
     if (geometryUrl == 'meatballs-obj/pumpkin.obj') {
       pumpkin = object;
+
+      // Try changing center of gravity
+      pumpkin.translateX(-11);
+      scene.add(pumpkin);
+
     } else {
       meatballs.push(object);
+      scene.add(object);
+
     }
   }, onProgress, onError); // Attach error, progress callbacks we defined above
 }
@@ -267,6 +273,7 @@ function render() {
   // Don't run until it has been created
   if (pumpkin) {
     pumpkin.rotation.y += 0.001;
+    // pumpkin.rotateOnAxis(y, 0.2);
   }
 
   renderer.render(scene, camera);
