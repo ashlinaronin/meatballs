@@ -102,11 +102,11 @@ function init() {
 
 
   // Attach an fps display -- Stats library also created by MrDoob
-  // stats = new Stats();
-  // stats.domElement.style.position = 'absolute';
-  // stats.domElement.style.top = '0px';
-  // stats.domElement.style.zIndex = 100;
-  // document.getElementById("container").appendChild(stats.domElement);
+  stats = new Stats();
+  stats.domElement.style.position = 'absolute';
+  stats.domElement.style.top = '0px';
+  stats.domElement.style.zIndex = 100;
+  document.getElementById("container").appendChild(stats.domElement);
 
 
 
@@ -253,7 +253,7 @@ function animate() {
   requestAnimationFrame(animate);
   render();
   controls.update();
-  // stats.update();
+  stats.update();
 }
 
 
